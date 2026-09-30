@@ -1,0 +1,1 @@
+-- Dành cho script tạo các bảng Users, Games và Moves; chưa triển khai.
