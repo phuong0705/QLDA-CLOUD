@@ -1,1 +1,636 @@
-/* Dành cho bố cục và thành phần của trang chơi. */
+/* ==========================================================================
+   GAME.CSS - Bố cục & Giao diện chuyên biệt cho màn hình bàn cờ Cờ Tướng
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Khu vực Bàn cờ và Người chơi (Cột trái)
+   -------------------------------------------------------------------------- */
+
+.board-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Thẻ thông tin người chơi */
+.player-card {
+  width: 100%;
+  max-width: 580px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.player-card.active-turn {
+  border-color: var(--border-color-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.player-info-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.player-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.player-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  border: 2px solid var(--border-color-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.player-avatar svg {
+  width: 28px;
+  height: 28px;
+}
+
+.piece-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Phe Đen */
+.player-black .piece-badge {
+  background: #111827;
+  color: #60a5fa;
+  border-color: #374151;
+}
+
+.player-black.active-turn {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 0 16px var(--player-black-glow);
+}
+
+/* Phe Đỏ */
+.player-red .piece-badge {
+  background: var(--player-red);
+  color: #ffffff;
+  border-color: #7f1d1d;
+}
+
+.player-red.active-turn {
+  border-color: rgba(230, 57, 70, 0.45);
+  box-shadow: 0 0 18px var(--player-red-glow);
+}
+
+.player-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.player-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-side-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.player-black .player-side-tag {
+  background: var(--player-black-surface);
+  color: var(--player-black-accent);
+}
+
+.player-red .player-side-tag {
+  background: var(--player-red-surface);
+  color: var(--player-red);
+}
+
+.player-elo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+}
+
+.elo-star {
+  color: var(--status-warning);
+  font-size: 0.75rem;
+}
+
+/* Đồng hồ đếm giờ (Timer) */
+.player-timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.timer-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.player-timer {
+  font-family: var(--font-family-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-color);
+  min-width: 86px;
+  text-align: center;
+  transition: all var(--transition-normal);
+}
+
+.player-card.active-turn .player-timer {
+  color: #ffffff;
+  border-color: var(--border-color-focus);
+}
+
+.player-red.active-turn .player-timer {
+  background: linear-gradient(145deg, rgba(230, 57, 70, 0.2), rgba(230, 57, 70, 0.05));
+  border-color: var(--player-red);
+  color: #ff8a93;
+}
+
+.player-black.active-turn .player-timer {
+  background: linear-gradient(145deg, rgba(96, 165, 250, 0.2), rgba(96, 165, 250, 0.05));
+  border-color: var(--player-black-accent);
+  color: #93c5fd;
+}
+
+.player-timer.time-warning {
+  color: var(--status-danger);
+  border-color: var(--status-danger);
+  animation: pulse-danger 1s infinite alternate;
+}
+
+@keyframes pulse-danger {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+/* --------------------------------------------------------------------------
+   Container Bàn cờ tướng (#chess-board)
+   -------------------------------------------------------------------------- */
+
+.board-wrapper {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  position: relative;
+}
+
+/* Container chính để renderer gắn bàn cờ vào */
+#chess-board {
+  width: 100%;
+  aspect-ratio: 9 / 10;
+  max-height: calc(100vh - 270px);
+  background: radial-gradient(circle at 50% 50%, var(--wood-bg-1) 0%, var(--wood-bg-2) 100%);
+  border: 10px solid var(--wood-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-board);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* Giao diện khung bàn cờ mô phỏng trước khi renderer đổ quân cờ */
+.board-placeholder-grid {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5%;
+}
+
+.board-river-banner {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10%;
+  color: var(--wood-river-text);
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  pointer-events: none;
+  font-family: "Noto Serif", Georgia, serif;
+}
+
+/* --------------------------------------------------------------------------
+   Bảng điều khiển, trạng thái & lịch sử (Cột phải / Aside)
+   -------------------------------------------------------------------------- */
+
+.game-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sidebar-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-badge {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-surface-elevated);
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Trạng thái trận đấu (#game-status)
+   -------------------------------------------------------------------------- */
+
+#game-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: var(--border-radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color-strong);
+  transition: all var(--transition-normal);
+}
+
+.status-turn-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.status-indicator-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--player-red);
+  box-shadow: 0 0 8px var(--player-red-glow);
+  flex-shrink: 0;
+}
+
+.status-indicator-dot.black-turn {
+  background: var(--player-black-accent);
+  box-shadow: 0 0 8px var(--player-black-glow);
+}
+
+.status-turn-text {
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.status-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Trạng thái Chiếu tướng */
+#game-status.check-state {
+  border-color: var(--status-danger);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+#game-status.check-state .status-message {
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+/* Trạng thái Kết thúc trận đấu */
+#game-status.gameover-state {
+  border-color: var(--status-warning);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Nhóm nút điều khiển trận đấu (Save, Restart, Resign)
+   -------------------------------------------------------------------------- */
+
+.control-buttons-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.btn-game-action {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--border-radius-md);
+  font-family: inherit;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.btn-game-action svg {
+  width: 20px;
+  height: 20px;
+  transition: transform var(--transition-fast);
+}
+
+.btn-game-action:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-color-strong);
+}
+
+.btn-game-action:hover svg {
+  transform: translateY(-2px);
+}
+
+.btn-game-action:active {
+  transform: translateY(1px);
+}
+
+/* Nút Save */
+#btn-save {
+  color: #93c5fd;
+}
+
+#btn-save:hover {
+  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+/* Nút Restart */
+#btn-restart {
+  color: #fcd34d;
+}
+
+#btn-restart:hover {
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+/* Nút Resign */
+#btn-resign {
+  color: #fca5a5;
+}
+
+#btn-resign:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   Lịch sử nước đi (#move-history)
+   -------------------------------------------------------------------------- */
+
+#move-history {
+  height: 280px;
+  max-height: 340px;
+  overflow-y: auto;
+  border-radius: var(--border-radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  scroll-behavior: smooth;
+}
+
+/* Tùy chỉnh thanh cuộn */
+#move-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+#move-history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#move-history::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+#move-history::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.history-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface-elevated);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 10;
+}
+
+.history-table td {
+  padding: 0.5rem 0.6rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.history-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.history-table td.col-index {
+  color: var(--text-muted);
+  font-family: var(--font-family-mono);
+  width: 18%;
+}
+
+.history-table td.col-red {
+  color: #ff999f;
+  font-weight: 500;
+  width: 41%;
+}
+
+.history-table td.col-black {
+  color: #93c5fd;
+  font-weight: 500;
+  width: 41%;
+}
+
+.history-table tr.current-turn-row td {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.history-empty-message {
+  height: 100%;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.history-empty-message svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Cho Mobile & Tablet
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 920px) {
+  .player-card,
+  .board-wrapper {
+    max-width: 100%;
+  }
+
+  #chess-board {
+    max-height: 60vh;
+  }
+
+  #move-history {
+    height: 200px;
+  }
+}
+
+@media (max-width: 520px) {
+  .player-card {
+    padding: 0.65rem 0.85rem;
+  }
+
+  .player-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .player-name {
+    font-size: 0.9rem;
+  }
+
+  .player-timer {
+    font-size: 1.15rem;
+    padding: 0.25rem 0.6rem;
+    min-width: 72px;
+  }
+
+  #chess-board {
+    border-width: 6px;
+  }
+
+  .control-buttons-group {
+    gap: 0.5rem;
+  }
+
+  .btn-game-action {
+    padding: 0.6rem 0.35rem;
+    font-size: 0.775rem;
+  }
+
+  .btn-game-action svg {
+    width: 18px;
+    height: 18px;
+  }
+}
