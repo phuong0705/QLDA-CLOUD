@@ -1,1 +1,199 @@
-/* Dành cho giao diện bàn Cờ Tướng 9x10. */
+/* ==========================================================================
+   BOARD.CSS - Giao diện Bàn cờ Cờ Tướng 9x10 (Chuẩn Kiến trúc Tách biệt)
+   ========================================================================== */
+
+:root {
+  /* Màu sắc đặc trưng cho bàn cờ Cờ Tướng */
+  --board-wood-bg: #dfb168;
+  --board-wood-dark: #b8863b;
+  --board-wood-border: #4d2d14;
+  --board-line-color: #523412;
+  --board-palace-line: #422509;
+  --board-river-text: rgba(82, 52, 18, 0.72);
+  --board-river-bg: rgba(78, 48, 16, 0.04);
+  --board-hover-glow: rgba(255, 255, 255, 0.22);
+  --board-focus-ring: #3b82f6;
+}
+
+/* --------------------------------------------------------------------------
+   Container Gốc của Bàn Cờ
+   -------------------------------------------------------------------------- */
+
+.xiangqi-board-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 9 / 10;
+  background: radial-gradient(circle at 50% 50%, var(--board-wood-bg) 0%, var(--board-wood-dark) 100%);
+  border-radius: 6px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   1. Layer Khung Bàn cờ & Đường kẻ (Lines, River, Palace Diagonals)
+   -------------------------------------------------------------------------- */
+
+.board-frame-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.board-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Đường kẻ thông thường */
+.board-line {
+  stroke: var(--board-line-color);
+  stroke-width: 1.8px;
+  stroke-linecap: square;
+  shape-rendering: geometricPrecision;
+}
+
+/* Khung viền ngoài cùng */
+.board-outer-border {
+  stroke: var(--board-wood-border);
+  stroke-width: 3.5px;
+  fill: none;
+  shape-rendering: geometricPrecision;
+}
+
+/* Đường chéo hai cửu cung (RÕ RÀNG & NỔI BẬT) */
+.board-palace-line {
+  stroke: var(--board-palace-line);
+  stroke-width: 2.2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  shape-rendering: geometricPrecision;
+}
+
+/* Dấu chữ thập định vị (Pháo & Tốt) */
+.board-marker-line {
+  stroke: var(--board-line-color);
+  stroke-width: 1.5px;
+  stroke-linecap: square;
+  shape-rendering: geometricPrecision;
+}
+
+/* Chữ trên Sông Sở Hà - Hán Giới */
+.board-river-label {
+  font-family: "Noto Serif TC", "Songti SC", "SimSun", "Noto Serif", Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 14px;
+  fill: var(--board-river-text);
+  dominant-baseline: middle;
+  text-anchor: middle;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Vùng bóng nước mờ ở giữa sông */
+.board-river-rect {
+  fill: var(--board-river-bg);
+}
+
+/* --------------------------------------------------------------------------
+   2. Layer 90 Ô Vị trí Tương tác (Interactive Squares Layer)
+   -------------------------------------------------------------------------- */
+
+.board-squares-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+/* Từng điểm giao cắt trong 90 vị trí */
+.board-square {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  z-index: 10;
+  outline: none;
+}
+
+/* Hiệu ứng rê chuột lên điểm giao cắt */
+.board-square:hover {
+  background: radial-gradient(circle, var(--board-hover-glow) 0%, transparent 65%);
+}
+
+/* Hiệu ứng chọn bằng bàn phím (A11y) */
+.board-square:focus-visible {
+  outline: 2px solid var(--board-focus-ring);
+  outline-offset: -2px;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+}
+
+/* Lớp biểu diễn Cửu Cung (Palace) */
+.board-square.is-palace {
+  /* Hỗ trợ styling hoặc tooltip nhận diện vùng Cung */
+}
+
+.board-square.palace-black {
+  /* Cửu cung Đen (hàng 0..2, cột 3..5) */
+}
+
+.board-square.palace-red {
+  /* Cửu cung Đỏ (hàng 7..9, cột 3..5) */
+}
+
+.board-square.palace-center {
+  /* Tâm cửu cung (1,4) và (8,4) */
+}
+
+/* Lớp biểu diễn Sông (River) */
+.board-square.is-river {
+  /* Điểm tiếp giáp bờ sông (hàng 4 và hàng 5) */
+}
+
+/* Các trạng thái sẵn sàng cho tương tác ván cờ sau này */
+.board-square.square-selected {
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.4) 0%, transparent 70%);
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.6);
+}
+
+.board-square.square-target::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.7);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.9);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   3. Layer Quân Cờ Tách Biệt (Pieces Layer)
+   -------------------------------------------------------------------------- */
+
+.board-pieces-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Khi có quân cờ trong layer, bản thân quân cờ nhận tương tác */
+.board-pieces-layer > * {
+  pointer-events: auto;
+}
