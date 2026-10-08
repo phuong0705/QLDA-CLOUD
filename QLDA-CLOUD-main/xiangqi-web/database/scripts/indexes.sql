@@ -1,0 +1,1 @@
+-- Dành cho các index SQL Server dự kiến; chưa có câu lệnh SQL thực tế.

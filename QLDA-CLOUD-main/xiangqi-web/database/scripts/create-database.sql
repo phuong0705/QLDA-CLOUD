@@ -1,0 +1,1 @@
+-- Dành cho script tạo database XiangqiDB; chưa có câu lệnh SQL thực tế.
