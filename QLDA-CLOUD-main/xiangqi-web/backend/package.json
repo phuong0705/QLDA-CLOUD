@@ -1,7 +1,0 @@
-{
-  "name": "xiangqi-web-backend",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Backend skeleton for the Xiangqi website",
-  "main": "src/server.js"
-}

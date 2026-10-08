@@ -1,1 +1,0 @@
--- Dành cho dữ liệu mẫu; chưa có dữ liệu seed.
