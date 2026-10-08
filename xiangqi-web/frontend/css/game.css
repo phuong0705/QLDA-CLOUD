@@ -378,18 +378,58 @@
 /* Trạng thái Chiếu tướng */
 #game-status.check-state {
   border-color: var(--status-danger);
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239, 68, 68, 0.12);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+  animation: status-check-pulse 1.2s infinite alternate ease-in-out;
+}
+
+#game-status.check-state .status-indicator-dot {
+  background: var(--status-danger);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+}
+
+#game-status.check-state .status-turn-text {
+  color: #fca5a5;
+  font-weight: 700;
 }
 
 #game-status.check-state .status-message {
   color: #fca5a5;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+@keyframes status-check-pulse {
+  0% {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+  }
+  100% {
+    border-color: rgba(239, 68, 68, 1);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.45);
+  }
 }
 
 /* Trạng thái Kết thúc trận đấu */
 #game-status.gameover-state {
   border-color: var(--status-warning);
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(245, 158, 11, 0.12);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+
+#game-status.gameover-state .status-indicator-dot {
+  background: var(--status-warning);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+}
+
+#game-status.gameover-state .status-turn-text {
+  color: #fde68a;
+  font-weight: 700;
+}
+
+#game-status.gameover-state .status-message {
+  color: #fde68a;
+  font-weight: 600;
 }
 
 /* --------------------------------------------------------------------------
@@ -468,6 +508,64 @@
 #btn-resign:hover {
   border-color: rgba(239, 68, 68, 0.5);
   background: rgba(239, 68, 68, 0.15);
+}
+
+/* Trạng thái bị vô hiệu hóa (Disabled state) */
+.btn-game-action:disabled,
+.btn-game-action.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(45%);
+  box-shadow: none !important;
+}
+
+/* Trạng thái đang tải / xử lý (Loading state) */
+.btn-game-action.is-loading {
+  position: relative;
+  opacity: 0.75;
+  pointer-events: none;
+  cursor: wait;
+}
+
+.btn-game-action.is-loading svg {
+  animation: btn-spin 0.8s linear infinite;
+}
+
+@keyframes btn-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Phản hồi trạng thái (Feedback state trên #game-status) */
+#game-status.status-feedback-success {
+  border-color: var(--status-success);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+#game-status.status-feedback-success .status-message {
+  color: #6ee7b7;
+  font-weight: 500;
+}
+
+#game-status.status-feedback-error {
+  border-color: var(--status-danger);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+#game-status.status-feedback-error .status-message {
+  color: #fca5a5;
+  font-weight: 500;
+}
+
+#game-status.status-feedback-warning {
+  border-color: var(--status-warning);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+#game-status.status-feedback-warning .status-message {
+  color: #fcd34d;
+  font-weight: 500;
 }
 
 /* --------------------------------------------------------------------------
@@ -634,3 +732,83 @@
     height: 18px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Highlight Tương tác Click & Nước đi Hợp lệ (game-ui.js)
+   -------------------------------------------------------------------------- */
+
+/* Ô cờ đang được chọn */
+.board-square.square-selected,
+.board-square.selected-square {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(245, 158, 11, 0.15) 60%, transparent 80%) !important;
+  box-shadow: 0 0 0 2.5px #f59e0b, 0 0 16px rgba(245, 158, 11, 0.7) !important;
+  border-radius: 50%;
+  animation: pulse-selected 1.5s ease-in-out infinite alternate;
+  z-index: 30;
+}
+
+@keyframes pulse-selected {
+  0% {
+    box-shadow: 0 0 0 2px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 3.5px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.85);
+  }
+}
+
+/* Quân cờ đang được chọn */
+.piece.piece-selected {
+  transform: scale(1.12) translateY(-4px) !important;
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.55),
+    0 0 16px rgba(245, 158, 11, 0.85) !important;
+  border-color: #f59e0b !important;
+  z-index: 35 !important;
+}
+
+/* Ô đích hợp lệ (di chuyển đến ô trống) */
+.board-square.square-target,
+.board-square.valid-target-square {
+  cursor: pointer;
+  z-index: 28;
+}
+
+.board-square.square-target::after,
+.board-square.valid-target-square::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8), 0 0 14px rgba(16, 185, 129, 0.5);
+  pointer-events: none;
+  animation: pulse-target 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-target {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Ô đích hợp lệ có thể ĂN QUÂN đối phương */
+.board-square.target-capture {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, rgba(239, 68, 68, 0.1) 60%, transparent 80%) !important;
+  box-shadow: 0 0 0 2.5px #ef4444, 0 0 14px rgba(239, 68, 68, 0.7) !important;
+  border-radius: 50%;
+}
+
+.board-square.target-capture::after {
+  background: #ef4444 !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.9) !important;
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid #ffffff !important;
+}
+

@@ -267,12 +267,170 @@ function getSquareElement(row, col) {
   return root.querySelector(`.board-square[data-row="${r}"][data-col="${c}"]`);
 }
 
+/**
+ * Danh sách các nhóm class highlight phục vụ dọn dẹp độc lập
+ */
+const HIGHLIGHT_CLASSES = {
+  moves: ['highlight-legal', 'valid-target-square', 'square-target', 'highlight-capture', 'target-capture'],
+  lastMove: ['highlight-last-from', 'last-move-from', 'highlight-last-to', 'last-move-to'],
+  check: ['highlight-check', 'square-check', 'piece-check'],
+  selected: ['square-selected', 'selected-square', 'piece-selected']
+};
+
+/**
+ * Xóa sạch các lớp highlight trên bàn cờ theo từng nhóm hoặc toàn bộ
+ * 
+ * @param {string} [type] - Loại highlight cần xóa:
+ *   - 'moves' | 'legal' | 'capture': xóa nước đi hợp lệ & ăn quân
+ *   - 'lastMove' | 'last': xóa nước đi trước đó
+ *   - 'check': xóa cảnh báo chiếu tướng
+ *   - 'selected' | 'selection': xóa trạng thái chọn quân
+ *   - undefined | null | 'all': xóa toàn bộ mọi highlight
+ */
+function clearHighlights(type) {
+  const root = currentBoardRoot || document;
+  if (!root) return;
+
+  const t = type ? String(type).trim().toLowerCase() : 'all';
+
+  let classesToRemove = [];
+  if (t === 'moves' || t === 'legal' || t === 'capture') {
+    classesToRemove = HIGHLIGHT_CLASSES.moves;
+  } else if (t === 'lastmove' || t === 'last') {
+    classesToRemove = HIGHLIGHT_CLASSES.lastMove;
+  } else if (t === 'check') {
+    classesToRemove = HIGHLIGHT_CLASSES.check;
+  } else if (t === 'selected' || t === 'selection') {
+    classesToRemove = HIGHLIGHT_CLASSES.selected;
+  } else {
+    // Mặc định 'all': xóa sạch toàn bộ
+    classesToRemove = [
+      ...HIGHLIGHT_CLASSES.moves,
+      ...HIGHLIGHT_CLASSES.lastMove,
+      ...HIGHLIGHT_CLASSES.check,
+      ...HIGHLIGHT_CLASSES.selected
+    ];
+  }
+
+  // Thu gom tất cả phần tử có chứa bất kỳ class nào trong danh sách
+  const selector = classesToRemove.map(c => `.${c}`).join(', ');
+  const elements = root.querySelectorAll(selector);
+  elements.forEach(el => {
+    classesToRemove.forEach(cls => el.classList.remove(cls));
+  });
+}
+
+/**
+ * Highlight danh sách các nước đi hợp lệ (legal moves & captures)
+ * Tuyệt đối không tự tính luật; chỉ nhận dữ liệu đã được tính từ engine/server.
+ * 
+ * @param {Array<{row: number, col: number, canCapture?: boolean}>} moves
+ */
+function highlightMoves(moves) {
+  // Dọn sạch highlight nước đi trước đó (giữ nguyên lastMove và check nếu có)
+  clearHighlights('moves');
+
+  if (!Array.isArray(moves) || moves.length === 0) {
+    return;
+  }
+
+  moves.forEach(m => {
+    if (!m) return;
+    const row = Number(m.row);
+    const col = Number(m.col);
+    if (!Number.isInteger(row) || !Number.isInteger(col) || row < 0 || row > 9 || col < 0 || col > 8) {
+      return;
+    }
+
+    const square = getSquareElement(row, col);
+    if (!square) return;
+
+    const canCapture = Boolean(m.canCapture || m.capture || m.isCapture);
+    if (canCapture) {
+      square.classList.add('highlight-capture', 'target-capture');
+    } else {
+      square.classList.add('highlight-legal', 'valid-target-square', 'square-target');
+    }
+  });
+}
+
+/**
+ * Highlight nước đi vừa diễn ra (Last Move: ô xuất phát và ô đích đến)
+ * 
+ * @param {{row: number, col: number}} from - Ô xuất phát
+ * @param {{row: number, col: number}} to - Ô đích đến
+ */
+function highlightLastMove(from, to) {
+  // Dọn highlight lastMove cũ trước khi vẽ mới
+  clearHighlights('lastMove');
+
+  if (from && typeof from.row === 'number' && typeof from.col === 'number') {
+    const sqFrom = getSquareElement(from.row, from.col);
+    if (sqFrom) {
+      sqFrom.classList.add('highlight-last-from', 'last-move-from');
+    }
+  }
+
+  if (to && typeof to.row === 'number' && typeof to.col === 'number') {
+    const sqTo = getSquareElement(to.row, to.col);
+    if (sqTo) {
+      sqTo.classList.add('highlight-last-to', 'last-move-to');
+    }
+  }
+}
+
+/**
+ * Highlight cảnh báo chiếu Tướng (Check state) tại vị trí quân Tướng/Soái
+ * 
+ * @param {{row: number, col: number}|null} position - Tọa độ quân Tướng bị chiếu
+ */
+function highlightCheck(position) {
+  // Dọn cảnh báo chiếu cũ
+  clearHighlights('check');
+
+  if (!position) return;
+
+  const row = Number(position.row);
+  const col = Number(position.col);
+  if (!Number.isInteger(row) || !Number.isInteger(col) || row < 0 || row > 9 || col < 0 || col > 8) {
+    return;
+  }
+
+  const square = getSquareElement(row, col);
+  if (!square) return;
+
+  square.classList.add('highlight-check', 'square-check');
+  const piece = square.querySelector('.piece');
+  if (piece) {
+    piece.classList.add('piece-check');
+  }
+}
+
 // Export theo chuẩn ES Modules
-export { renderBoard, getSquareElement };
+export {
+  renderBoard,
+  getSquareElement,
+  highlightMoves,
+  highlightLastMove,
+  highlightCheck,
+  clearHighlights
+};
 
 // Đăng ký toàn cục để tương thích khi gọi từ script không dùng module bundler
 if (typeof window !== 'undefined') {
-  window.boardRenderer = { renderBoard, getSquareElement };
+  window.boardRenderer = {
+    renderBoard,
+    getSquareElement,
+    highlightMoves,
+    highlightLastMove,
+    highlightCheck,
+    clearHighlights
+  };
   window.renderBoard = renderBoard;
   window.getSquareElement = getSquareElement;
+  window.highlightMoves = highlightMoves;
+  window.highlightLastMove = highlightLastMove;
+  window.highlightCheck = highlightCheck;
+  window.clearHighlights = clearHighlights;
 }
+
