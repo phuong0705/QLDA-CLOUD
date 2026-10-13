@@ -202,3 +202,528 @@
   opacity: 0.45;
   color: var(--text-muted, #657185);
 }
+
+/* ==========================================================================
+   GIAO DIỆN TRANG LỊCH SỬ ĐẤU & VÁN CỜ ĐÃ LƯU (history.html)
+   ========================================================================== */
+
+:root {
+  --hist-bg: #0f172a;
+  --hist-card-bg: #1e293b;
+  --hist-card-border: #334155;
+  --hist-text-primary: #f8fafc;
+  --hist-text-secondary: #94a3b8;
+  --hist-text-muted: #64748b;
+  --hist-accent-red: #ef4444;
+  --hist-accent-green: #22c55e;
+  --hist-accent-amber: #f59e0b;
+  --hist-accent-blue: #3b82f6;
+  --hist-radius: 12px;
+  --hist-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+
+body.history-body {
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #0b0f19 0%, #1e293b 60%, #0f172a 100%);
+  color: var(--hist-text-primary);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Header & Nav */
+.history-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--hist-card-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.history-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fbbf24;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.history-brand .brand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 50%;
+  color: #ef4444;
+  font-size: 1.1rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-links .nav-link {
+  color: var(--hist-text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.nav-links .nav-link:hover {
+  color: var(--hist-text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-links .nav-link.active {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  font-weight: 600;
+}
+
+/* Container */
+.history-container {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  flex: 1;
+}
+
+/* Page Header */
+.history-page-header {
+  margin-bottom: 28px;
+}
+
+.history-page-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--hist-text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.history-page-desc {
+  font-size: 0.95rem;
+  color: var(--hist-text-secondary);
+}
+
+/* Sections */
+.history-section {
+  background: var(--hist-card-bg);
+  border: 1px solid var(--hist-card-border);
+  border-radius: var(--hist-radius);
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: var(--hist-shadow);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--hist-card-border);
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--hist-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Saved Games Grid & Cards */
+.saved-games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.saved-game-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--hist-card-border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.saved-game-card:hover {
+  transform: translateY(-2px);
+  border-color: #60a5fa;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+}
+
+.saved-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.saved-card-id {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hist-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.saved-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--hist-text-secondary);
+}
+
+.saved-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.saved-card-footer {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Match History Table */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--hist-card-border);
+}
+
+.match-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.match-table th {
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--hist-text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--hist-card-border);
+  white-space: nowrap;
+}
+
+.match-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.match-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Opponent cell */
+.opponent-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.opponent-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--hist-text-primary);
+  flex-shrink: 0;
+}
+
+.opponent-name {
+  font-weight: 600;
+  color: var(--hist-text-primary);
+}
+
+.opponent-elo {
+  font-size: 0.78rem;
+  color: var(--hist-text-muted);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.badge-win {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.badge-loss {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-draw {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.badge-mode {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  font-weight: 600;
+}
+
+.badge-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-black {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-success {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  background: #15803d;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--hist-text-secondary);
+  border: 1px solid var(--hist-card-border);
+}
+
+.btn-outline:hover {
+  color: var(--hist-text-primary);
+  border-color: #64748b;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+}
+
+/* Empty States */
+.empty-state-box {
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+.empty-state-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--hist-text-primary);
+}
+
+.empty-state-desc {
+  font-size: 0.9rem;
+  color: var(--hist-text-secondary);
+  max-width: 400px;
+}
+
+/* Auth Required Card */
+.auth-required-box {
+  background: var(--hist-card-bg);
+  border: 1px solid var(--hist-card-border);
+  border-radius: var(--hist-radius);
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--hist-shadow);
+}
+
+.auth-required-icon {
+  font-size: 3rem;
+}
+
+.auth-required-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--hist-text-primary);
+}
+
+.auth-required-desc {
+  font-size: 0.95rem;
+  color: var(--hist-text-secondary);
+  max-width: 450px;
+  line-height: 1.5;
+}
+
+/* Error Box */
+.error-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--hist-radius);
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.error-title {
+  color: #f87171;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.error-desc {
+  color: #fca5a5;
+  font-size: 0.9rem;
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Pagination Bar */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hist-card-border);
+}
+
+.pagination-info {
+  font-size: 0.88rem;
+  color: var(--hist-text-muted);
+}
+
+.pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .saved-games-grid {
+    grid-template-columns: 1fr;
+  }
+  .history-container {
+    padding: 20px 12px 40px;
+  }
+}
+

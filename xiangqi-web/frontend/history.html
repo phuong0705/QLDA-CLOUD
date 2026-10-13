@@ -1,1 +1,160 @@
-<!-- Trang lịch sử trận đấu. Chưa triển khai giao diện. -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử & Ván cờ đã lưu - Xiangqi Web</title>
+    <meta name="description" content="Xem lại các trận cờ tướng đã đấu, tỷ số thắng thua, và tiếp tục ván đấu đang tạm lưu.">
+    <link rel="stylesheet" href="css/history.css">
+</head>
+<body class="history-body">
+
+    <!-- Thanh điều hướng Header -->
+    <header class="history-nav">
+        <a href="index.html" class="history-brand">
+            <span class="brand-icon" aria-hidden="true">帥</span>
+            <span>Xiangqi Web</span>
+        </a>
+        <nav class="nav-links" aria-label="Điều hướng chính">
+            <a href="index.html" class="nav-link">Trang chủ</a>
+            <a href="game.html" class="nav-link">Chơi cờ</a>
+            <a href="leaderboard.html" class="nav-link">Bảng xếp hạng</a>
+            <a href="history.html" class="nav-link active" aria-current="page">Lịch sử</a>
+            <a href="profile.html" class="nav-link">Hồ sơ</a>
+        </nav>
+    </header>
+
+    <main class="history-container">
+        <!-- Tiêu đề trang -->
+        <header class="history-page-header">
+            <h1 class="history-page-title">
+                <span>📜</span> Lịch Sử & Ván Đấu Đã Lưu
+            </h1>
+            <p class="history-page-desc">
+                Theo dõi chiến tích các trận đấu đã hoàn tất và tiếp tục các ván cờ đang tạm lưu.
+            </p>
+        </header>
+
+        <!-- Khối hiển thị khi chưa đăng nhập hoặc token hết hạn -->
+        <section id="authRequiredSection" class="auth-required-box" style="display: none;" aria-live="polite">
+            <div class="auth-required-icon" aria-hidden="true">🔒</div>
+            <h2 class="auth-required-title">Yêu cầu đăng nhập</h2>
+            <p class="auth-required-desc" id="authRequiredMessage">
+                Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn. Vui lòng đăng nhập để xem lịch sử đấu và tiếp tục ván cờ.
+            </p>
+            <a href="login.html?redirect=history.html" class="btn btn-primary">Đăng nhập ngay</a>
+        </section>
+
+        <!-- Khối hiển thị khi có lỗi kết nối / API -->
+        <section id="errorSection" class="error-box" style="display: none;" aria-live="assertive">
+            <h2 class="error-title">⚠️ Đã xảy ra lỗi</h2>
+            <p class="error-desc" id="errorMessage">Không thể tải dữ liệu lịch sử đấu. Vui lòng kiểm tra lại kết nối mạng.</p>
+            <button type="button" id="retryBtn" class="btn btn-outline btn-sm">Thử lại</button>
+        </section>
+
+        <!-- Khối Loading State (Skeleton) -->
+        <div id="loadingSection" aria-busy="true" aria-label="Đang tải dữ liệu">
+            <!-- Loading Skeleton cho Saved Games -->
+            <section class="history-section">
+                <div class="skeleton" style="width: 250px; height: 26px; margin-bottom: 20px;"></div>
+                <div class="saved-games-grid">
+                    <div class="skeleton" style="height: 140px; border-radius: 10px;"></div>
+                    <div class="skeleton" style="height: 140px; border-radius: 10px;"></div>
+                </div>
+            </section>
+            <!-- Loading Skeleton cho Match History -->
+            <section class="history-section">
+                <div class="skeleton" style="width: 200px; height: 26px; margin-bottom: 20px;"></div>
+                <div class="skeleton" style="height: 220px; border-radius: 8px;"></div>
+            </section>
+        </div>
+
+        <!-- Khối Nội Dung Chính (Khi có dữ liệu) -->
+        <div id="contentSection" style="display: none;">
+
+            <!-- ======================================================== -->
+            <!-- KHU VỰC 1: SAVED / RESUMABLE GAMES                       -->
+            <!-- ======================================================== -->
+            <section id="savedGamesSection" class="history-section" aria-labelledby="savedHeading">
+                <header class="section-header">
+                    <h2 id="savedHeading" class="section-title">
+                        <span>💾</span> Ván Đấu Đang Lưu & Có Thể Tiếp Tục
+                    </h2>
+                    <span id="savedGamesCount" class="section-badge">0 ván</span>
+                </header>
+
+                <!-- Danh sách ván cờ tạm lưu -->
+                <div id="savedGamesGrid" class="saved-games-grid">
+                    <!-- Cards ván cờ lưu được chèn động từ history.js -->
+                </div>
+
+                <!-- Empty state khi không có ván cờ lưu -->
+                <div id="savedGamesEmpty" class="empty-state-box" style="display: none;">
+                    <div class="empty-state-icon" aria-hidden="true">📂</div>
+                    <div class="empty-state-title">Không có ván cờ nào đang lưu</div>
+                    <div class="empty-state-desc">Các ván đấu tạm dừng hoặc ván đang chơi dở dang sẽ xuất hiện tại đây để bạn tiếp tục thi đấu.</div>
+                </div>
+            </section>
+
+            <!-- ======================================================== -->
+            <!-- KHU VỰC 2: MATCH HISTORY                                 -->
+            <!-- ======================================================== -->
+            <section id="matchHistorySection" class="history-section" aria-labelledby="historyHeading">
+                <header class="section-header">
+                    <h2 id="historyHeading" class="section-title">
+                        <span>⚔️</span> Lịch Sử Trận Đấu
+                    </h2>
+                    <span id="matchHistoryCount" class="section-badge">0 trận</span>
+                </header>
+
+                <!-- Bảng danh sách trận đấu -->
+                <div id="matchHistoryTableContainer" class="table-responsive">
+                    <table class="match-table" aria-label="Danh sách trận đấu đã hoàn tất">
+                        <thead>
+                            <tr>
+                                <th scope="col">Mã ván</th>
+                                <th scope="col">Thời gian</th>
+                                <th scope="col">Chế độ</th>
+                                <th scope="col">Cầm quân</th>
+                                <th scope="col">Đối thủ</th>
+                                <th scope="col">Số nước</th>
+                                <th scope="col">Kết quả</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matchHistoryTbody">
+                            <!-- Các hàng trận đấu được chèn động từ history.js -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty state khi chưa có lịch sử đấu -->
+                <div id="matchHistoryEmpty" class="empty-state-box" style="display: none;">
+                    <div class="empty-state-icon" aria-hidden="true">📭</div>
+                    <div class="empty-state-title">Chưa có lịch sử đấu nào</div>
+                    <div class="empty-state-desc">Bạn chưa hoàn thành trận đấu nào. Hãy tạo phòng thi đấu trực tuyến hoặc thử sức với Máy (AI) ngay!</div>
+                    <a href="game.html" class="btn btn-primary" style="margin-top: 10px;">⚔️ Bắt đầu ván mới</a>
+                </div>
+
+                <!-- Thanh phân trang cho Lịch sử trận đấu -->
+                <footer id="paginationBar" class="pagination-bar" style="display: none;">
+                    <div class="pagination-info" id="paginationInfo">
+                        Hiển thị trang 1 / 1
+                    </div>
+                    <div class="pagination-actions">
+                        <button type="button" id="prevPageBtn" class="btn btn-outline btn-sm" disabled>« Trang trước</button>
+                        <button type="button" id="nextPageBtn" class="btn btn-outline btn-sm" disabled>Trang sau »</button>
+                    </div>
+                </footer>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Scripts cần thiết theo cấu trúc dự án -->
+    <script src="js/auth/authManager.js"></script>
+    <script src="js/api/gameApi.js"></script>
+    <script src="js/game/save-load.js"></script>
+    <script src="js/user/history.js"></script>
+</body>
+</html>
