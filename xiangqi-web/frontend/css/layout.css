@@ -1,1 +1,322 @@
-/* Dành cho bố cục chung của các trang. */
+/* ==========================================================================
+   LAYOUT.CSS - Bố cục chung & Hệ thống thiết kế cho Xiangqi Web
+   ========================================================================== */
+
+:root {
+  /* Bảng màu chủ đạo (Dark Theme sang trọng kết hợp sắc gỗ Cờ Tướng) */
+  --bg-body: #0f1218;
+  --bg-header: rgba(18, 22, 31, 0.85);
+  --bg-surface: #171c26;
+  --bg-surface-elevated: #202736;
+  --bg-surface-hover: #293245;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-color-strong: rgba(255, 255, 255, 0.16);
+  --border-color-focus: #4f8cf6;
+
+  /* Màu chữ */
+  --text-main: #f3f5f9;
+  --text-secondary: #9da9be;
+  --text-muted: #657185;
+  --text-inverse: #0d1117;
+
+  /* Màu phe Cờ Tướng */
+  --player-red: #e63946;
+  --player-red-hover: #f05360;
+  --player-red-surface: rgba(230, 57, 70, 0.12);
+  --player-red-glow: rgba(230, 57, 70, 0.35);
+
+  --player-black: #1d2533;
+  --player-black-accent: #60a5fa;
+  --player-black-surface: rgba(96, 165, 250, 0.1);
+  --player-black-glow: rgba(96, 165, 250, 0.3);
+
+  /* Bàn cờ và chất liệu gỗ */
+  --wood-border: #4d2d14;
+  --wood-bg-1: #e9be7a;
+  --wood-bg-2: #cca05a;
+  --wood-line: #5c3514;
+  --wood-river-text: rgba(92, 53, 20, 0.55);
+
+  /* Màu trạng thái */
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+  --status-success: #10b981;
+  --status-info: #3b82f6;
+
+  /* Typography */
+  --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+
+  /* Kích thước & Khoảng cách */
+  --header-height: 64px;
+  --border-radius-sm: 6px;
+  --border-radius-md: 10px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+
+  /* Hiệu ứng bóng */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-board: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 8px #3b220d;
+
+  /* Chuyển động */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* ==========================================================================
+   CSS Reset & Base Rules
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 2px solid var(--border-color-focus);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Header & Navigation
+   ========================================================================== */
+
+.site-header {
+  height: var(--header-height);
+  background: var(--bg-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-container {
+  max-width: 1400px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: opacity var(--transition-fast);
+}
+
+.brand-link:hover {
+  opacity: 0.9;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e9be7a, #996024);
+  color: #3b1b05;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border: 2px solid #5a310c;
+}
+
+.brand-title {
+  letter-spacing: 0.5px;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.925rem;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.nav-link:hover {
+  color: var(--text-main);
+  background-color: var(--bg-surface-elevated);
+}
+
+.nav-link.active {
+  color: var(--text-main);
+  background-color: var(--bg-surface-elevated);
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-icon {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-color-strong);
+}
+
+/* ==========================================================================
+   Main Layout Structure
+   ========================================================================== */
+
+.page-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-main {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 380px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  padding: 1rem 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.footer-kbd-hints {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+kbd {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color-strong);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-family: var(--font-family-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Responsive Layout Rules
+   ========================================================================== */
+
+@media (max-width: 1100px) {
+  .game-main {
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 920px) {
+  .game-main {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .nav-list {
+    display: none; /* Rút gọn trên mobile cho không gian chơi */
+  }
+
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    padding: 0 1rem;
+  }
+
+  .game-main {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .site-footer {
+    padding: 0.75rem 1rem;
+  }
+}

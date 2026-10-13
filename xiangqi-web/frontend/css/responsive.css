@@ -1,1 +1,299 @@
-/* Dành cho quy tắc responsive trên các kích thước màn hình. */
+/* ==========================================================================
+   RESPONSIVE.CSS - Hệ Thống Quy Tắc Co Giãn Responsive Cho Xiangqi Web
+   ========================================================================== */
+
+@import url('history.css');
+
+/* Đảm bảo toàn bộ viewport không bao giờ phát sinh scroll ngang */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Breakpoint 1: Màn hình trung bình / Laptop nhỏ (<= 1024px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .game-main {
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  .player-card,
+  .board-wrapper {
+    max-width: 100%;
+  }
+
+  #chess-board {
+    max-height: 60vh;
+  }
+
+  #move-history {
+    height: 240px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Breakpoint 2: Tablet & Màn hình di động ngang (<= 768px) [BẮT BUỘC]
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Bố cục chuyển sang 1 cột duy nhất */
+  .game-main {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  /* Bàn cờ và 2 người chơi ở phía trên */
+  .board-section {
+    order: 1;
+    width: 100%;
+    max-width: 100%;
+    align-items: center;
+  }
+
+  /* Bàn cờ co giãn mượt theo chiều rộng màn hình, tuyệt đối không dùng pixel cố định */
+  .board-wrapper {
+    width: 100%;
+    max-width: min(580px, 94vw);
+    padding: 0.25rem;
+    margin: 0 auto;
+  }
+
+  #chess-board {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 9 / 10;
+    max-height: calc(100vh - 240px);
+    border-width: 8px;
+  }
+
+  .player-card {
+    width: 100%;
+    max-width: min(580px, 94vw);
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Panel lịch sử và nhóm điều khiển chuyển xuống dưới bàn cờ */
+  .game-sidebar {
+    order: 2;
+    width: 100%;
+    max-width: min(580px, 94vw);
+    margin: 0 auto;
+    gap: 1rem;
+  }
+
+  .sidebar-card {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  /* Các nút điều khiển vẫn giữ kích thước chuẩn, bấm dễ dàng không bị thu hẹp */
+  .control-buttons-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    width: 100%;
+  }
+
+  .btn-game-action {
+    min-height: 44px;
+    padding: 0.65rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  #move-history {
+    height: 220px;
+    max-height: 260px;
+  }
+
+  .nav-list {
+    display: none;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Breakpoint 3: Điện thoại thông minh (<= 480px) [BẮT BUỘC]
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .site-header {
+    height: 54px;
+  }
+
+  .header-container {
+    padding: 0 0.85rem;
+  }
+
+  .brand-title {
+    font-size: 1.1rem;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  .game-main {
+    padding: 0.5rem;
+    gap: 0.85rem;
+  }
+
+  .board-section {
+    gap: 0.5rem;
+  }
+
+  .board-wrapper {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  #chess-board {
+    border-width: 5px;
+    border-radius: 6px;
+    max-height: calc(100vh - 210px);
+  }
+
+  .player-card {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-md, 10px);
+    gap: 0.5rem;
+  }
+
+  .player-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .player-name {
+    font-size: 0.85rem;
+  }
+
+  .player-elo {
+    font-size: 0.75rem;
+  }
+
+  .player-timer {
+    font-size: 1.15rem;
+    padding: 0.2rem 0.5rem;
+    min-width: 68px;
+  }
+
+  #game-status {
+    padding: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .status-turn-text {
+    font-size: 0.85rem;
+  }
+
+  .status-message {
+    font-size: 0.8rem;
+  }
+
+  .control-buttons-group {
+    gap: 0.45rem;
+  }
+
+  .btn-game-action {
+    min-height: 44px;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-game-action svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sidebar-card {
+    padding: 0.85rem;
+  }
+
+  #move-history {
+    height: 190px;
+    padding: 0.35rem;
+  }
+
+  .history-table th,
+  .history-table td {
+    padding: 0.4rem 0.25rem;
+    font-size: 0.775rem;
+  }
+
+  .move-coords {
+    font-size: 0.75rem;
+  }
+
+  .move-piece-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .site-footer {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .footer-kbd-hints {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Breakpoint 4: Màn hình cực nhỏ (<= 390px / 375px) [DoD Verification]
+   -------------------------------------------------------------------------- */
+@media (max-width: 390px) {
+  .game-main {
+    padding: 0.35rem;
+  }
+
+  .board-wrapper {
+    max-width: 100%;
+  }
+
+  #chess-board {
+    border-width: 4px;
+  }
+
+  .player-card {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .player-timer {
+    font-size: 1.05rem;
+    min-width: 60px;
+    padding: 0.15rem 0.35rem;
+  }
+
+  .history-table th,
+  .history-table td {
+    padding: 0.35rem 0.2rem;
+    font-size: 0.725rem;
+  }
+
+  .move-time {
+    display: none; /* Ẩn timestamp trên màn hình cực nhỏ để không gây tràn dòng */
+  }
+
+  .move-cell {
+    gap: 0.25rem;
+  }
+}

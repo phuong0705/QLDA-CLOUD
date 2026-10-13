@@ -1,1 +1,204 @@
-/* Dành cho giao diện lịch sử trận đấu. */
+/* ==========================================================================
+   HISTORY.CSS - Giao diện Bảng Lịch Sử Nước Đi Cờ Tướng (Xiangqi Move History)
+   ========================================================================== */
+
+/* Container cuộn của lịch sử nước đi (#move-history) */
+#move-history {
+  width: 100%;
+  height: 280px;
+  max-height: 340px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: var(--border-radius-md, 10px);
+  background: var(--bg-surface-elevated, #202736);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  padding: 0.5rem;
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+}
+
+/* Tùy chỉnh thanh cuộn đẹp mắt & mượt */
+#move-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+#move-history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#move-history::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 3px;
+}
+
+#move-history::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Bảng lịch sử nước đi (.history-table) */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  table-layout: fixed;
+  box-sizing: border-box;
+}
+
+/* Tiêu đề bảng cố định khi cuộn (Sticky Header) */
+.history-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface-elevated, #202736);
+  color: var(--text-muted, #657185);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.history-table td {
+  padding: 0.45rem 0.55rem;
+  color: var(--text-secondary, #9da9be);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.history-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Cột số thứ tự (#) */
+.history-table th.col-index,
+.history-table td.col-index {
+  color: var(--text-muted, #657185);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.8rem;
+  width: 15%;
+  text-align: center;
+}
+
+/* Cột phe Đỏ */
+.history-table th.col-red,
+.history-table td.col-red {
+  width: 42.5%;
+}
+
+/* Cột phe Đen */
+.history-table th.col-black,
+.history-table td.col-black {
+  width: 42.5%;
+}
+
+/* Ô hiển thị thông tin chi tiết nước đi (.move-cell) */
+.move-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Huy hiệu quân cờ (Quân + Ký hiệu chữ Hán) */
+.move-piece-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.piece-badge-red {
+  background: var(--player-red-surface, rgba(230, 57, 70, 0.15));
+  color: #ff8a93;
+  border: 1px solid rgba(230, 57, 70, 0.45);
+  box-shadow: 0 1px 3px rgba(230, 57, 70, 0.2);
+}
+
+.piece-badge-black {
+  background: var(--player-black-surface, rgba(96, 165, 250, 0.15));
+  color: #93c5fd;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  box-shadow: 0 1px 3px rgba(96, 165, 250, 0.2);
+}
+
+/* Tọa độ nước đi (from -> to) */
+.move-coords {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.8rem;
+  color: var(--text-main, #f3f5f9);
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+/* Ký hiệu nước đi nếu có (e.g. Pháo 2 bình 5) */
+.move-notation {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #9da9be);
+  margin-left: 0.2rem;
+  white-space: nowrap;
+}
+
+/* Thời điểm thực hiện nước đi (Timestamp) */
+.move-time {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--text-muted, #657185);
+  margin-left: auto;
+  padding-left: 0.25rem;
+  white-space: nowrap;
+}
+
+/* Placeholder khi ô chưa có nước đi */
+.move-empty {
+  color: var(--text-muted, #657185);
+  opacity: 0.5;
+  padding-left: 0.5rem;
+}
+
+/* Dòng nước đi vừa được thực hiện gần nhất (.current-turn-row) */
+.history-table tr.current-turn-row td {
+  background: rgba(79, 140, 246, 0.1);
+  color: var(--text-main, #f3f5f9);
+  font-weight: 600;
+}
+
+.history-table tr.current-turn-row td.col-index {
+  color: var(--status-info, #3b82f6);
+  font-weight: 700;
+}
+
+/* Empty State khi chưa có nước đi nào */
+.history-empty-message {
+  height: 100%;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #657185);
+  font-size: 0.85rem;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.history-empty-message svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.45;
+  color: var(--text-muted, #657185);
+}

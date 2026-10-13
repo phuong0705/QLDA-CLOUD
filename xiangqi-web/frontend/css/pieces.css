@@ -1,1 +1,172 @@
-/* Dành cho cách hiển thị quân cờ. */
+/* ==========================================================================
+   PIECES.CSS - Giao diện & Hiệu ứng Quân cờ Cờ Tướng (Xiangqi Pieces)
+   ========================================================================== */
+
+:root {
+  /* Màu sắc quân Cờ Tướng */
+  --piece-wood-base: #f7eed7;
+  --piece-wood-rim: #c4995c;
+  --piece-wood-border: #7e4f1a;
+  --piece-wood-shadow: rgba(0, 0, 0, 0.45);
+
+  /* Phe Đỏ (RED) */
+  --piece-red-color: #c92a2a;
+  --piece-red-dark: #8c1212;
+  --piece-red-ring: rgba(201, 42, 42, 0.35);
+  --piece-red-glow: rgba(239, 68, 68, 0.5);
+
+  /* Phe Đen (BLACK) */
+  --piece-black-color: #1a1e29;
+  --piece-black-dark: #0a0c10;
+  --piece-black-ring: rgba(40, 50, 70, 0.35);
+  --piece-black-glow: rgba(59, 130, 246, 0.4);
+
+  --piece-size: 84%;
+}
+
+/* --------------------------------------------------------------------------
+   Phần tử Quân cờ Chính (.piece)
+   -------------------------------------------------------------------------- */
+
+.piece {
+  position: relative;
+  width: var(--piece-size);
+  height: var(--piece-size);
+  max-width: 58px;
+  max-height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+  z-index: 25;
+
+  /* Thiết kế chất liệu gỗ mài tiện truyền thống */
+  background: radial-gradient(circle at 35% 32%, #fff6e5 0%, var(--piece-wood-base) 45%, var(--piece-wood-rim) 95%);
+  border: 2px solid var(--piece-wood-border);
+  box-shadow:
+    0 4px 8px var(--piece-wood-shadow),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35);
+
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.1, 1), box-shadow 0.15s ease;
+  pointer-events: auto;
+}
+
+/* Vòng rãnh tròn khắc chìm phía trong quân cờ */
+.piece-inner {
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(126, 79, 26, 0.3);
+  pointer-events: none;
+}
+
+/* Ký tự chữ Hán khắc trên quân cờ */
+.piece-symbol {
+  font-family: "Kaiti", "STKaiti", "Noto Serif TC", "Songti SC", "SimSun", "Noto Serif", Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Phân định Phe: QUÂN ĐỎ (RED)
+   -------------------------------------------------------------------------- */
+
+.piece-red,
+.piece.red {
+  border-color: #8c2323;
+}
+
+.piece-red .piece-inner,
+.piece.red .piece-inner {
+  border-color: var(--piece-red-ring);
+}
+
+.piece-red .piece-symbol,
+.piece.red .piece-symbol {
+  color: var(--piece-red-color);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7),
+    0 -0.5px 0 var(--piece-red-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Phân định Phe: QUÂN ĐEN (BLACK)
+   -------------------------------------------------------------------------- */
+
+.piece-black,
+.piece.black {
+  border-color: #3b2c1d;
+}
+
+.piece-black .piece-inner,
+.piece.black .piece-inner {
+  border-color: var(--piece-black-ring);
+}
+
+.piece-black .piece-symbol,
+.piece.black .piece-symbol {
+  color: var(--piece-black-color);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 -0.5px 0 var(--piece-black-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Hiệu ứng Tương tác & Trợ năng (A11y)
+   -------------------------------------------------------------------------- */
+
+.piece:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow:
+    0 8px 14px var(--piece-wood-shadow),
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.piece:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 3px;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
+}
+
+/* Quân cờ đang được chọn (Selected State) */
+.piece.piece-selected {
+  transform: scale(1.12) translateY(-4px);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.5),
+    0 0 14px rgba(245, 158, 11, 0.85);
+  border-color: #d97706;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive cho Mobile
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .piece {
+    width: 88%;
+    height: 88%;
+  }
+
+  .piece-symbol {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .piece-symbol {
+    font-size: 1.05rem;
+  }
+}

@@ -1,1 +1,114 @@
-<!-- Trang đăng ký. Chưa triển khai authentication. -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - Cờ Tướng Online (Xiangqi Web)</title>
+    <meta name="description" content="Đăng ký tài khoản mới để tham gia các ván cờ tướng trực tuyến hấp dẫn cùng cộng đồng kỳ thủ.">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+    <main class="auth-container">
+        <section class="auth-card">
+            <header class="auth-header">
+                <div class="auth-logo" aria-hidden="true">將</div>
+                <h1 class="auth-title">Tạo tài khoản mới</h1>
+                <p class="auth-subtitle">Gia nhập cộng đồng kỳ thủ Cờ Tướng Online</p>
+            </header>
+
+            <!-- Khu vực hiển thị thông báo lỗi / thành công (Không dùng alert) -->
+            <div id="authAlert" class="auth-alert" style="display: none;" role="alert" aria-live="polite">
+                <span class="auth-alert-icon" id="alertIcon">⚠️</span>
+                <span id="alertMessage">Thông báo</span>
+            </div>
+
+            <!-- Form đăng ký -->
+            <form id="registerForm" class="auth-form" novalidate>
+                <div class="form-group">
+                    <label for="usernameInput" class="form-label">
+                        Tên người dùng (Username) <span class="required-mark" aria-hidden="true">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="usernameInput" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Từ 3-50 ký tự (chữ cái, số, gạch dưới)" 
+                        autocomplete="username" 
+                        autofocus 
+                        required 
+                        aria-required="true"
+                    >
+                    <div id="usernameError" class="field-error-text" aria-live="polite"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailInput" class="form-label">
+                        Địa chỉ Email <span class="required-mark" aria-hidden="true">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="emailInput" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="vidu@domain.com" 
+                        autocomplete="email" 
+                        required 
+                        aria-required="true"
+                    >
+                    <div id="emailError" class="field-error-text" aria-live="polite"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordInput" class="form-label">
+                        Mật khẩu <span class="required-mark" aria-hidden="true">*</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="passwordInput" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Tối thiểu 6 ký tự" 
+                        autocomplete="new-password" 
+                        required 
+                        aria-required="true"
+                    >
+                    <div id="passwordError" class="field-error-text" aria-live="polite"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPasswordInput" class="form-label">
+                        Xác nhận mật khẩu <span class="required-mark" aria-hidden="true">*</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="confirmPasswordInput" 
+                        name="confirmPassword" 
+                        class="form-input" 
+                        placeholder="Nhập lại mật khẩu ở trên" 
+                        autocomplete="new-password" 
+                        required 
+                        aria-required="true"
+                    >
+                    <div id="confirmPasswordError" class="field-error-text" aria-live="polite"></div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    <span id="btnText">Đăng ký tài khoản</span>
+                </button>
+            </form>
+
+            <footer class="auth-footer">
+                Đã có tài khoản? <a href="login.html" class="auth-link">Đăng nhập ngay</a>
+            </footer>
+        </section>
+
+        <a href="index.html" class="back-home">← Về trang chủ</a>
+    </main>
+
+    <!-- Scripts xác thực -->
+    <script src="js/auth/authManager.js"></script>
+    <script src="js/api/authApi.js"></script>
+    <script src="js/auth/register.js"></script>
+</body>
+</html>
