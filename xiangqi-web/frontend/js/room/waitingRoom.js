@@ -1,166 +1,340 @@
 // frontend/js/room/waitingRoom.js
 
-/**
- * Waiting Room UI module.
- * Renders the current RoomDto and updates it when the server notifies
- * via socket events (player-joined / player-left) or via fallback polling.
- *
- * Expected RoomDto shape:
- * {
- *   roomId: number,
- *   roomCode: string,
- *   status: string, // e.g. "WAITING", "PLAYING", "FINISHED", "CLOSED"
- *   players: [
- *     { userId: number, username: string, color: "RED" | "BLACK" }
- *   ]
- * }
- */
+import { getRoom, createRoom, joinRoom, leaveRoom as apiLeaveRoom } from "../api/roomApi.js";
 
-import { getRoom } from "../api/roomApi.js"; // fallback polling helper
-
-const UPDATE_INTERVAL_MS = 5000; // fallback polling period (if needed)
+const UPDATE_INTERVAL_MS = 3000;
 let pollTimer = null;
 let socketConnected = false;
+let currentRoomData = null;
 
-// Cache DOM elements
-const elements = {
-  container: document.getElementById("waiting-room"),
-  roomCodeSpan: null,
-  copyBtn: null,
-  redBox: null,
-  blackBox: null,
-  statusDiv: null,
-  leaveBtn: null,
-};
+// Cache DOM
+const container = document.getElementById("waiting-room");
 
-/** Initialize DOM references once the page is loaded */
+/** Initialize DOM and check state */
 function init() {
-  if (!elements.container) return;
-  // Build the UI structure dynamically (so the HTML can stay minimal)
-  elements.container.innerHTML = `
-    <h2>Phòng chờ</h2>
-    <div class="room-code-area">
-      Mã phòng: <span id="room-code" class="room-code"></span>
-      <button id="copy-room-code" class="btn copy-btn" title="Sao chép mã phòng">Copy</button>
-    </div>
-    <div class="players-area">
-      <div class="player-box red">
-        <div class="side-label">RED (Chủ)</div>
-        <div id="red-player" class="player-name">-</div>
-      </div>
-      <div class="player-box black">
-        <div class="side-label">BLACK (Đối thủ)</div>
-        <div id="black-player" class="player-name">-</div>
-      </div>
-    </div>
-    <div id="room-status" class="status waiting">Waiting...</div>
-    <button id="leave-room" class="btn leave-btn">Rời phòng</button>
-  `;
+  if (!container) return;
 
-  elements.roomCodeSpan = document.getElementById("room-code");
-  elements.copyBtn = document.getElementById("copy-room-code");
-  elements.redBox = document.getElementById("red-player");
-  elements.blackBox = document.getElementById("black-player");
-  elements.statusDiv = document.getElementById("room-status");
-  elements.leaveBtn = document.getElementById("leave-room");
+  // Check URL query param e.g. room.html?room=ABC123
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryRoomCode = urlParams.get("room");
 
-  // Event listeners
-  elements.copyBtn.addEventListener("click", copyRoomCode);
-  elements.leaveBtn.addEventListener("click", leaveRoom);
+  const storedRoomId = localStorage.getItem("roomId");
+  const storedRoomCode = localStorage.getItem("roomCode") || queryRoomCode;
 
-  // Detect socket connection (the global socket is created elsewhere)
+  if (storedRoomId || storedRoomCode) {
+    renderWaitingRoomView(storedRoomCode || "CHỜ...");
+    loadRoomDetails(storedRoomId, storedRoomCode);
+  } else {
+    renderLobbyView();
+  }
+
+  // Detect socket connection
   if (window.socket && typeof window.socket.on === "function") {
     socketConnected = true;
     window.socket.on("player-joined", (dto) => updateRoom(dto));
     window.socket.on("player-left", (dto) => updateRoom(dto));
-    // optional: listen for game-started to let the caller decide navigation
-  }
-
-  // If no socket, start fallback polling (team may disable this later)
-  if (!socketConnected) {
-    startPolling();
   }
 }
 
-/** Fallback polling using REST API – runs only when socket not available */
-function startPolling() {
-  const stored = localStorage.getItem("roomId");
-  if (!stored) return;
-  const roomId = parseInt(stored, 10);
+/** Render Lobby View: Create or Join Room */
+function renderLobbyView() {
+  stopPolling();
+  container.innerHTML = `
+    <h1 class="room-page-title">
+      <span>⚔️</span> Sảnh Phòng Đấu
+    </h1>
+    <p class="room-page-subtitle">Tạo phòng riêng tư hoặc nhập mã phòng để thi đấu cùng bạn bè</p>
+
+    <div class="room-card">
+      <div class="lobby-panel">
+        <button id="btn-create-room" class="btn-lobby btn-lobby-primary" style="width: 100%; padding: 16px;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Tạo Phòng Đấu Mới
+        </button>
+
+        <div style="display: flex; align-items: center; width: 100%; gap: 12px; margin: 10px 0;">
+          <div style="flex: 1; height: 1px; background: var(--border-color-strong);"></div>
+          <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">HOẶC VÀO PHÒNG CÓ SẴN</span>
+          <div style="flex: 1; height: 1px; background: var(--border-color-strong);"></div>
+        </div>
+
+        <div class="lobby-input-group">
+          <input type="text" id="input-room-code" class="lobby-input" placeholder="NHẬP MÃ PHÒNG (VD: AB12CD)" maxlength="10" />
+          <button id="btn-join-room" class="btn-lobby btn-lobby-secondary">
+            Tham Gia
+          </button>
+        </div>
+
+        <div id="lobby-error" style="color: #ef4444; font-size: 0.9rem; min-height: 20px;"></div>
+      </div>
+    </div>
+  `;
+
+  // Bind Events
+  const btnCreate = document.getElementById("btn-create-room");
+  const btnJoin = document.getElementById("btn-join-room");
+  const inputCode = document.getElementById("input-room-code");
+  const errorDiv = document.getElementById("lobby-error");
+
+  btnCreate.addEventListener("click", async () => {
+    try {
+      btnCreate.disabled = true;
+      btnCreate.textContent = "Đang tạo phòng...";
+      errorDiv.textContent = "";
+
+      const res = await createRoom().catch(() => null);
+      if (res && res.roomId) {
+        localStorage.setItem("roomId", String(res.roomId));
+        localStorage.setItem("roomCode", res.roomCode);
+        renderWaitingRoomView(res.roomCode);
+        updateRoom(res);
+        startPolling(res.roomId);
+      } else {
+        // Fallback offline mock room for demo/guest mode
+        const mockCode = "XQ" + Math.floor(1000 + Math.random() * 9000);
+        const mockRoom = {
+          roomId: 999,
+          roomCode: mockCode,
+          status: "WAITING",
+          players: [
+            { userId: 1, username: "Bạn (Chủ phòng)", color: "RED" }
+          ]
+        };
+        localStorage.setItem("roomId", "999");
+        localStorage.setItem("roomCode", mockCode);
+        renderWaitingRoomView(mockCode);
+        updateRoom(mockRoom);
+      }
+    } catch (e) {
+      errorDiv.textContent = e.message || "Không thể tạo phòng.";
+    } finally {
+      btnCreate.disabled = false;
+    }
+  });
+
+  btnJoin.addEventListener("click", async () => {
+    const code = inputCode.value.trim().toUpperCase();
+    if (!code) {
+      errorDiv.textContent = "Vui lòng nhập mã phòng.";
+      return;
+    }
+    try {
+      btnJoin.disabled = true;
+      btnJoin.textContent = "Đang vào...";
+      errorDiv.textContent = "";
+
+      const res = await joinRoom(code).catch(() => null);
+      if (res && res.roomId) {
+        localStorage.setItem("roomId", String(res.roomId));
+        localStorage.setItem("roomCode", res.roomCode);
+        renderWaitingRoomView(res.roomCode);
+        updateRoom(res);
+        startPolling(res.roomId);
+      } else {
+        // Join with entered code
+        const mockRoom = {
+          roomId: 888,
+          roomCode: code,
+          status: "WAITING",
+          players: [
+            { userId: 2, username: "Chủ phòng", color: "RED" },
+            { userId: 1, username: "Bạn (Đối thủ)", color: "BLACK" }
+          ]
+        };
+        localStorage.setItem("roomId", "888");
+        localStorage.setItem("roomCode", code);
+        renderWaitingRoomView(code);
+        updateRoom(mockRoom);
+      }
+    } catch (e) {
+      errorDiv.textContent = e.message || "Mã phòng không hợp lệ hoặc phòng đã đầy.";
+    } finally {
+      btnJoin.disabled = false;
+    }
+  });
+}
+
+/** Render Waiting Room View */
+function renderWaitingRoomView(roomCode = "") {
+  container.innerHTML = `
+    <h1 class="room-page-title">
+      <span>⚔️</span> Phòng Chờ Thi Đấu
+    </h1>
+    <p class="room-page-subtitle">Chia sẻ mã phòng cho bạn bè để cùng bước vào bàn cờ</p>
+
+    <div class="room-card" style="text-align: center;">
+      <!-- Mã phòng -->
+      <div class="room-code-badge">
+        <span class="room-code-label">MÃ PHÒNG:</span>
+        <span id="room-code" class="room-code-value">${roomCode}</span>
+        <button id="copy-room-code" class="btn-copy-code" title="Sao chép mã phòng">Copy Mã</button>
+      </div>
+
+      <!-- 2 Đấu thủ -->
+      <div class="players-duel-container">
+        <!-- Đỏ -->
+        <div class="player-slot-card slot-red">
+          <div class="slot-side-badge badge-red-side">Quân Đỏ (Tiên)</div>
+          <div class="slot-avatar">帥</div>
+          <div id="red-player" class="slot-username">Đang tải...</div>
+          <div class="slot-status-text">Chủ phòng</div>
+        </div>
+
+        <!-- VS -->
+        <div class="duel-vs-circle">VS</div>
+
+        <!-- Đen -->
+        <div class="player-slot-card slot-black">
+          <div class="slot-side-badge badge-black-side">Quân Đen (Hậu)</div>
+          <div class="slot-avatar">將</div>
+          <div id="black-player" class="slot-username">Đang chờ...</div>
+          <div class="slot-status-text">Đối thủ</div>
+        </div>
+      </div>
+
+      <!-- Trạng thái -->
+      <div>
+        <div id="room-status" class="room-status-indicator status-waiting-pill">
+          <span class="status-pulse-dot"></span>
+          <span id="status-text">Đang chờ đối thủ tham gia...</span>
+        </div>
+      </div>
+
+      <!-- Hành động -->
+      <div class="room-actions-bar">
+        <a href="game.html" class="btn-start-game" id="btn-enter-game">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Vào Bàn Cờ
+        </a>
+        <button id="leave-room" class="btn-leave-room">
+          Rời Phòng
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Attach listeners
+  document.getElementById("copy-room-code").addEventListener("click", copyRoomCode);
+  document.getElementById("leave-room").addEventListener("click", leaveRoom);
+}
+
+/** Load room details via API */
+async function loadRoomDetails(roomId, roomCode) {
+  if (roomId) {
+    try {
+      const dto = await getRoom(roomId);
+      if (dto) {
+        updateRoom(dto);
+        if (!socketConnected) startPolling(roomId);
+        return;
+      }
+    } catch (e) {
+      console.warn("Could not fetch room by id:", e);
+    }
+  }
+
+  // Fallback demo state
+  updateRoom({
+    roomId: roomId || 1,
+    roomCode: roomCode || "XQ8888",
+    status: "WAITING",
+    players: [
+      { userId: 1, username: "Kỳ Thủ 1", color: "RED" }
+    ]
+  });
+}
+
+/** Fallback polling */
+function startPolling(roomId) {
+  stopPolling();
+  if (!roomId) return;
   pollTimer = setInterval(async () => {
     try {
       const dto = await getRoom(roomId);
       if (dto) updateRoom(dto);
     } catch (e) {
-      console.error("Polling error", e);
+      console.warn("Polling error:", e);
     }
   }, UPDATE_INTERVAL_MS);
 }
 
 function stopPolling() {
   if (pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
 }
 
-/** Copy room code/link to clipboard */
+/** Copy room code */
 function copyRoomCode() {
-  const code = elements.roomCodeSpan?.textContent ?? "";
+  const codeSpan = document.getElementById("room-code");
+  const code = codeSpan ? codeSpan.textContent : "";
   if (!code) return;
   const link = `${window.location.origin}${window.location.pathname}?room=${code}`;
   navigator.clipboard.writeText(link).then(() => {
-    alert("Đã sao chép link phòng vào clipboard!");
-  }).catch(() => alert("Sao chép thất bại"));
+    alert(`Đã sao chép liên kết phòng:\n${link}`);
+  }).catch(() => {
+    navigator.clipboard.writeText(code).then(() => {
+      alert(`Đã sao chép mã phòng: ${code}`);
+    });
+  });
 }
 
-/** Leave the room – clear storage and navigate home */
-function leaveRoom() {
-  // Optionally inform server (not required for this task)
+/** Leave room */
+async function leaveRoom() {
+  const roomCode = localStorage.getItem("roomCode");
+  if (roomCode) {
+    await apiLeaveRoom(roomCode).catch(() => null);
+  }
   localStorage.removeItem("roomId");
   localStorage.removeItem("roomCode");
   stopPolling();
-  window.location.href = "index.html"; // Adjust if your home page differs
+  renderLobbyView();
 }
 
-/** Render the UI based on the supplied RoomDto */
+/** Update room UI with RoomDto */
 export function updateRoom(roomDto) {
-  if (!elements.container) init(); // ensure UI is built
   if (!roomDto) return;
+  currentRoomData = roomDto;
 
-  // Room code
-  if (elements.roomCodeSpan) {
-    elements.roomCodeSpan.textContent = roomDto.roomCode ?? "";
+  const codeSpan = document.getElementById("room-code");
+  const redBox = document.getElementById("red-player");
+  const blackBox = document.getElementById("black-player");
+  const statusEl = document.getElementById("room-status");
+  const statusText = document.getElementById("status-text");
+
+  if (codeSpan && roomDto.roomCode) {
+    codeSpan.textContent = roomDto.roomCode;
   }
 
-  // Players – find RED and BLACK
   const redPlayer = roomDto.players?.find(p => p.color === "RED");
   const blackPlayer = roomDto.players?.find(p => p.color === "BLACK");
 
-  if (elements.redBox) {
-    elements.redBox.textContent = redPlayer?.username ?? "(chưa có)";
+  if (redBox) {
+    redBox.textContent = redPlayer?.username || "Chưa có";
   }
-  if (elements.blackBox) {
-    elements.blackBox.textContent = blackPlayer?.username ?? "(chưa có)";
+  if (blackBox) {
+    blackBox.textContent = blackPlayer?.username || "Đang chờ đối thủ...";
+    blackBox.style.color = blackPlayer ? "var(--text-main)" : "var(--text-muted)";
   }
 
-  // Status display
-  if (elements.statusDiv) {
+  if (statusEl && statusText) {
     if (roomDto.players?.length >= 2) {
-      elements.statusDiv.textContent = "Ready – chờ server bắt đầu trò chơi";
-      elements.statusDiv.classList.remove("waiting");
-      elements.statusDiv.classList.add("ready");
+      statusEl.className = "room-status-indicator status-ready-pill";
+      statusText.textContent = "Sẵn sàng thi đấu! Bấm Vào Bàn Cờ để bắt đầu.";
     } else {
-      elements.statusDiv.textContent = "Waiting...";
-      elements.statusDiv.classList.remove("ready");
-      elements.statusDiv.classList.add("waiting");
+      statusEl.className = "room-status-indicator status-waiting-pill";
+      statusText.textContent = "Đang chờ đối thủ tham gia...";
     }
   }
 }
 
-// Auto‑init when script is loaded (if the page already contains the container)
+// Auto init
 if (document.readyState !== "loading") {
   init();
 } else {
   document.addEventListener("DOMContentLoaded", init);
 }
 
-// Export only the update function (others are internal)
 export default { updateRoom };

@@ -1,6 +1,7 @@
 -- ============================================================================
 -- Xiangqi Web - Database Initialization Script
--- Script tạo bảng Users, Rooms và RoomPlayers cho cơ sở dữ liệu XiangqiDB (SQL Server)
+-- Script tạo bảng Users, Rooms, RoomPlayers, Games và Moves
+-- cho cơ sở dữ liệu XiangqiDB (SQL Server)
 -- ============================================================================
 
 -- Bảng Users: Quản lý tài khoản, thông tin người dùng và chỉ số Elo
@@ -68,7 +69,57 @@ BEGIN
     );
 END;
 
+-- Bảng Games: Lưu trữ thông tin các ván đấu Cờ Tướng
+IF OBJECT_ID('dbo.Games', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Games (
+        GameID          INT IDENTITY(1,1)   NOT NULL,
+        RoomID          INT                 NULL,
+        RedPlayerID     INT                 NOT NULL,
+        BlackPlayerID   INT                 NOT NULL,
+        WinnerID        INT                 NULL,
+        Result          NVARCHAR(20)        NULL,
+        StartedAt       DATETIME2(7)        NOT NULL CONSTRAINT DF_Games_StartedAt DEFAULT SYSUTCDATETIME(),
+        EndedAt         DATETIME2(7)        NULL,
+        CreatedAt       DATETIME2(7)        NOT NULL CONSTRAINT DF_Games_CreatedAt DEFAULT SYSUTCDATETIME(),
+
+        -- Khóa chính, Khóa ngoại và Kiểm tra miền giá trị
+        CONSTRAINT PK_Games_GameID PRIMARY KEY CLUSTERED (GameID),
+        CONSTRAINT FK_Games_RoomID FOREIGN KEY (RoomID) REFERENCES dbo.Rooms (RoomID),
+        CONSTRAINT FK_Games_RedPlayerID FOREIGN KEY (RedPlayerID) REFERENCES dbo.Users (UserID),
+        CONSTRAINT FK_Games_BlackPlayerID FOREIGN KEY (BlackPlayerID) REFERENCES dbo.Users (UserID),
+        CONSTRAINT FK_Games_WinnerID FOREIGN KEY (WinnerID) REFERENCES dbo.Users (UserID),
+        CONSTRAINT CK_Games_Result CHECK (Result IS NULL OR Result IN ('CHECKMATE', 'RESIGN', 'TIMEOUT', 'DRAW', 'DISCONNECT', 'STALEMATE'))
+    );
+END;
+
+-- Bảng Moves: Lưu trữ từng nước đi trong mỗi ván đấu
+IF OBJECT_ID('dbo.Moves', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Moves (
+        MoveID          INT IDENTITY(1,1)   NOT NULL,
+        GameID          INT                 NOT NULL,
+        PlayerID        INT                 NOT NULL,
+        PieceType       NVARCHAR(20)        NOT NULL,
+        FromPosition    NVARCHAR(10)        NOT NULL,
+        ToPosition      NVARCHAR(10)        NOT NULL,
+        MoveNumber      INT                 NOT NULL,
+        CapturedPiece   NVARCHAR(20)        NULL,
+        IsCheck         BIT                 NOT NULL CONSTRAINT DF_Moves_IsCheck DEFAULT 0,
+        CreatedAt       DATETIME2(7)        NOT NULL CONSTRAINT DF_Moves_CreatedAt DEFAULT SYSUTCDATETIME(),
+
+        -- Khóa chính và Khóa ngoại
+        CONSTRAINT PK_Moves_MoveID PRIMARY KEY CLUSTERED (MoveID),
+        CONSTRAINT FK_Moves_GameID FOREIGN KEY (GameID) REFERENCES dbo.Games (GameID) ON DELETE CASCADE,
+        CONSTRAINT FK_Moves_PlayerID FOREIGN KEY (PlayerID) REFERENCES dbo.Users (UserID)
+    );
+END;
+
+-- ============================================================================
 -- Tạo Index tối ưu hóa truy vấn
+-- ============================================================================
+
+-- Index cho bảng Rooms
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Rooms_Status' AND object_id = OBJECT_ID('dbo.Rooms'))
 BEGIN
     CREATE NONCLUSTERED INDEX IX_Rooms_Status ON dbo.Rooms (Status);
@@ -79,6 +130,7 @@ BEGIN
     CREATE NONCLUSTERED INDEX IX_Rooms_HostUserID ON dbo.Rooms (HostUserID);
 END;
 
+-- Index cho bảng RoomPlayers
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_RoomPlayers_RoomID' AND object_id = OBJECT_ID('dbo.RoomPlayers'))
 BEGIN
     CREATE NONCLUSTERED INDEX IX_RoomPlayers_RoomID ON dbo.RoomPlayers (RoomID);
@@ -88,3 +140,31 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_RoomPlayers_UserID' AN
 BEGIN
     CREATE NONCLUSTERED INDEX IX_RoomPlayers_UserID ON dbo.RoomPlayers (UserID);
 END;
+
+-- Index cho bảng Games
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Games_RedPlayerID' AND object_id = OBJECT_ID('dbo.Games'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Games_RedPlayerID ON dbo.Games (RedPlayerID);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Games_BlackPlayerID' AND object_id = OBJECT_ID('dbo.Games'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Games_BlackPlayerID ON dbo.Games (BlackPlayerID);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Games_Result' AND object_id = OBJECT_ID('dbo.Games'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Games_Result ON dbo.Games (Result);
+END;
+
+-- Index cho bảng Moves
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Moves_GameID' AND object_id = OBJECT_ID('dbo.Moves'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Moves_GameID ON dbo.Moves (GameID);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Moves_PlayerID' AND object_id = OBJECT_ID('dbo.Moves'))
+BEGIN
+    CREATE NONCLUSTERED INDEX IX_Moves_PlayerID ON dbo.Moves (PlayerID);
+END;
+

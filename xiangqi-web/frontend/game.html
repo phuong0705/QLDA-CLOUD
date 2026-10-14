@@ -16,31 +16,22 @@
 </head>
 <body>
 
-  <!-- Thanh tiêu đề điều hướng chung -->
-  <header class="site-header">
+  <!-- Thanh tiêu đề điều hướng chung (Unified Topbar) -->
+  <header class="site-nav">
     <div class="header-container">
       <a href="index.html" class="brand-link" aria-label="Trang chủ Xiangqi Web">
         <span class="brand-icon" aria-hidden="true">帥</span>
         <span class="brand-title">Xiangqi Web</span>
       </a>
 
-      <nav class="main-nav" aria-label="Điều hướng chính">
-        <ul class="nav-list">
-          <li><a href="index.html" class="nav-link">Trang chủ</a></li>
-          <li><a href="room.html" class="nav-link">Phòng chơi</a></li>
-          <li><a href="leaderboard.html" class="nav-link">Bảng xếp hạng</a></li>
-          <li><a href="history.html" class="nav-link">Lịch sử</a></li>
-        </ul>
+      <nav class="nav-menu" aria-label="Điều hướng chính">
+        <a href="index.html" class="nav-item">Trang chủ</a>
+        <a href="game.html" class="nav-item active" aria-current="page">Chơi cờ</a>
+        <a href="room.html" class="nav-item">Phòng chơi</a>
+        <a href="leaderboard.html" class="nav-item">Bảng xếp hạng</a>
+        <a href="history.html" class="nav-item">Lịch sử</a>
+        <a href="profile.html" class="nav-item">Hồ sơ</a>
       </nav>
-
-      <div class="header-actions">
-        <a href="profile.html" class="btn-icon" aria-label="Hồ sơ cá nhân" title="Hồ sơ cá nhân">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </a>
-      </div>
     </div>
   </header>
 

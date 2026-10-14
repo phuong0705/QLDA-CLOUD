@@ -21,7 +21,7 @@
   --piece-black-ring: rgba(40, 50, 70, 0.35);
   --piece-black-glow: rgba(59, 130, 246, 0.4);
 
-  --piece-size: 84%;
+  --piece-size: 80%;
 }
 
 /* --------------------------------------------------------------------------
@@ -32,8 +32,8 @@
   position: relative;
   width: var(--piece-size);
   height: var(--piece-size);
-  max-width: 58px;
-  max-height: 58px;
+  max-width: 52px;
+  max-height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -70,13 +70,14 @@
 
 /* Ký tự chữ Hán khắc trên quân cờ */
 .piece-symbol {
-  font-family: "Kaiti", "STKaiti", "Noto Serif TC", "Songti SC", "SimSun", "Noto Serif", Georgia, serif;
-  font-size: 1.6rem;
+  font-family: "KaiTi", "STKaiti", "BiauKai", "Microsoft YaHei", "Noto Serif TC", "Songti SC", "SimSun", serif;
+  font-size: 1.45rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.5px;
   text-align: center;
   pointer-events: none;
+  display: block;
 }
 
 /* --------------------------------------------------------------------------

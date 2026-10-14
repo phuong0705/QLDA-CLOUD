@@ -1,1 +1,372 @@
-<!-- Trang lịch sử trận đấu. Chưa triển khai giao diện. -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lịch sử các ván đấu cờ tướng trên Xiangqi Web - Xem lại kết quả, đối thủ, thời gian và số nước đi.">
+  <title>Lịch Sử Trận Đấu - Xiangqi Web</title>
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    .history-page-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all var(--transition-fast);
+    }
+
+    .filter-btn:hover {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .filter-btn.active {
+      background: #e63946;
+      color: #ffffff;
+      border-color: #e63946;
+      font-weight: 600;
+    }
+
+    /* History Cards List */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .match-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 20px;
+      transition: all var(--transition-fast);
+    }
+
+    .match-card:hover {
+      background: var(--bg-surface-elevated);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .players-duel {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .player-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .side-badge {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-red {
+      background: rgba(230, 57, 70, 0.2);
+      color: #ff6b6b;
+      border: 1px solid rgba(230, 57, 70, 0.4);
+    }
+
+    .badge-black {
+      background: rgba(96, 165, 250, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    .duel-vs {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .match-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .result-win {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .result-loss {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .result-draw {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-replay {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-replay:hover {
+      background: #e63946;
+      color: #ffffff;
+      border-color: #e63946;
+    }
+
+    @media (max-width: 768px) {
+      .match-card {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .match-meta {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header (Unified Topbar) -->
+  <header class="site-nav">
+    <div class="header-container">
+      <a href="index.html" class="brand-link" aria-label="Trang chủ Xiangqi Web">
+        <span class="brand-icon" aria-hidden="true">帥</span>
+        <span class="brand-title">Xiangqi Web</span>
+      </a>
+
+      <nav class="nav-menu" aria-label="Điều hướng chính">
+        <a href="index.html" class="nav-item">Trang chủ</a>
+        <a href="game.html" class="nav-item">Chơi cờ</a>
+        <a href="room.html" class="nav-item">Phòng chơi</a>
+        <a href="leaderboard.html" class="nav-item">Bảng xếp hạng</a>
+        <a href="history.html" class="nav-item active" aria-current="page">Lịch sử</a>
+        <a href="profile.html" class="nav-item">Hồ sơ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="history-page-container">
+    <div class="page-header">
+      <h1 class="page-title">
+        <span>📜</span> Lịch Sử Trận Đấu
+      </h1>
+
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" data-filter="all">Tất cả (4)</button>
+        <button class="filter-btn" data-filter="win">Thắng (2)</button>
+        <button class="filter-btn" data-filter="loss">Thua (1)</button>
+        <button class="filter-btn" data-filter="draw">Hòa (1)</button>
+      </div>
+    </div>
+
+    <!-- Match List -->
+    <div class="history-list" id="match-list">
+      
+      <!-- Match 1 -->
+      <article class="match-card" data-result="win">
+        <div class="players-duel">
+          <div class="player-tag">
+            <span class="side-badge badge-red">Đỏ</span>
+            <span>Bạn (NguyenVanA)</span>
+          </div>
+          <span class="duel-vs">VS</span>
+          <div class="player-tag">
+            <span class="side-badge badge-black">Đen</span>
+            <span>TranThiB</span>
+          </div>
+        </div>
+
+        <div class="match-meta">
+          <span class="result-badge result-win">✓ Thắng (+16 Elo)</span>
+          <span>42 nước • 14 phút • Chiếu bí</span>
+          <span>14/10/2026 09:30</span>
+        </div>
+
+        <div>
+          <a href="game.html" class="btn-replay">
+            <span>▶</span> Xem lại
+          </a>
+        </div>
+      </article>
+
+      <!-- Match 2 -->
+      <article class="match-card" data-result="win">
+        <div class="players-duel">
+          <div class="player-tag">
+            <span class="side-badge badge-black">Đen</span>
+            <span>Bạn (NguyenVanA)</span>
+          </div>
+          <span class="duel-vs">VS</span>
+          <div class="player-tag">
+            <span class="side-badge badge-red">Đỏ</span>
+            <span>LeVanC</span>
+          </div>
+        </div>
+
+        <div class="match-meta">
+          <span class="result-badge result-win">✓ Thắng (+14 Elo)</span>
+          <span>56 nước • 18 phút • Đối thủ xin thua</span>
+          <span>13/10/2026 21:15</span>
+        </div>
+
+        <div>
+          <a href="game.html" class="btn-replay">
+            <span>▶</span> Xem lại
+          </a>
+        </div>
+      </article>
+
+      <!-- Match 3 -->
+      <article class="match-card" data-result="loss">
+        <div class="players-duel">
+          <div class="player-tag">
+            <span class="side-badge badge-red">Đỏ</span>
+            <span>Bạn (NguyenVanA)</span>
+          </div>
+          <span class="duel-vs">VS</span>
+          <div class="player-tag">
+            <span class="side-badge badge-black">Đen</span>
+            <span>PhamVanD</span>
+          </div>
+        </div>
+
+        <div class="match-meta">
+          <span class="result-badge result-loss">✗ Thua (-12 Elo)</span>
+          <span>38 nước • 11 phút • Hết thời gian</span>
+          <span>12/10/2026 15:40</span>
+        </div>
+
+        <div>
+          <a href="game.html" class="btn-replay">
+            <span>▶</span> Xem lại
+          </a>
+        </div>
+      </article>
+
+      <!-- Match 4 -->
+      <article class="match-card" data-result="draw">
+        <div class="players-duel">
+          <div class="player-tag">
+            <span class="side-badge badge-black">Đen</span>
+            <span>Bạn (NguyenVanA)</span>
+          </div>
+          <span class="duel-vs">VS</span>
+          <div class="player-tag">
+            <span class="side-badge badge-red">Đỏ</span>
+            <span>HoangVanE</span>
+          </div>
+        </div>
+
+        <div class="match-meta">
+          <span class="result-badge result-draw">= Hòa (+1 Elo)</span>
+          <span>60 nước • 25 phút • Thỏa thuận hòa</span>
+          <span>11/10/2026 18:20</span>
+        </div>
+
+        <div>
+          <a href="game.html" class="btn-replay">
+            <span>▶</span> Xem lại
+          </a>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <script>
+    // Simple filter handling
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+        document.querySelectorAll('.match-card').forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-result') === filter) {
+            card.style.display = 'grid';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
