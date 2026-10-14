@@ -102,25 +102,31 @@ body {
 }
 
 /* ==========================================================================
-   Header & Navigation
+/* ==========================================================================
+   Header & Navigation (Unified Right-Aligned Topbar)
    ========================================================================== */
 
+.site-nav,
 .site-header {
-  height: var(--header-height);
-  background: var(--bg-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .header-container {
+  width: 100%;
   max-width: 1400px;
-  height: 100%;
   margin: 0 auto;
-  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -129,11 +135,11 @@ body {
 .brand-link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
   text-decoration: none;
-  color: var(--text-main);
+  color: #ffffff;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 18px;
   transition: opacity var(--transition-fast);
 }
 
@@ -142,80 +148,71 @@ body {
 }
 
 .brand-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #e9be7a, #996024);
-  color: #3b1b05;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 1.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  border: 2px solid #5a310c;
+  width: 34px;
+  height: 34px;
+  background: #b91c1c;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 18px;
+  font-family: "KaiTi", "STKaiti", "SimSun", serif;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(185, 28, 28, 0.45);
 }
 
 .brand-title {
   letter-spacing: 0.5px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
-.main-nav {
-  display: flex;
-  align-items: center;
-}
-
+/* Menu bên phải */
+.nav-menu,
+.main-nav,
 .nav-list {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
   list-style: none;
-  gap: 0.5rem;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
+.nav-item,
 .nav-link {
-  text-decoration: none;
   color: var(--text-secondary);
-  font-size: 0.925rem;
+  text-decoration: none;
+  font-size: 14px;
   font-weight: 500;
-  padding: 0.5rem 0.85rem;
-  border-radius: var(--border-radius-sm);
-  transition: all var(--transition-fast);
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  display: inline-block;
 }
 
+.nav-item:hover,
 .nav-link:hover {
-  color: var(--text-main);
-  background-color: var(--bg-surface-elevated);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
+.nav-item.active,
 .nav-link.active {
-  color: var(--text-main);
-  background-color: var(--bg-surface-elevated);
+  color: #ffffff;
+  background: rgba(185, 28, 28, 0.35);
+  border: 1px solid rgba(239, 68, 68, 0.55);
   font-weight: 600;
 }
 
 .header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.btn-icon {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-icon:hover {
-  color: var(--text-main);
-  background: var(--bg-surface-elevated);
-  border-color: var(--border-color-strong);
+  display: none;
 }
 
 /* ==========================================================================
@@ -233,10 +230,10 @@ body {
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 0.85rem 1.5rem;
   display: grid;
   grid-template-columns: minmax(360px, 1fr) 380px;
-  gap: 1.75rem;
+  gap: 1.25rem;
   align-items: start;
 }
 

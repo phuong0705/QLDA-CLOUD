@@ -67,10 +67,10 @@ function generateMarkerSVG(x, y, hasLeft, hasRight) {
  */
 function generateBoardSVG() {
   const cell = 80;
-  const padX = 40;
-  const padY = 40;
-  const totalW = 720;
-  const totalH = 800;
+  const padX = 48;
+  const padY = 48;
+  const totalW = 736;
+  const totalH = 816;
 
   // 1. Viền ngoài
   let svg = `<svg class="board-svg" viewBox="0 0 ${totalW} ${totalH}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`;
@@ -100,8 +100,8 @@ function generateBoardSVG() {
   // 4. Vùng sông và Chữ Sở Hà - Hán Giới
   const riverTop = padY + 4 * cell;
   svg += `<rect x="${padX}" y="${riverTop}" width="${8 * cell}" height="${cell}" class="board-river-rect" />`;
-  svg += `<text x="200" y="400" class="board-river-label">楚 河</text>`;
-  svg += `<text x="520" y="400" class="board-river-label">漢 界</text>`;
+  svg += `<text x="208" y="408" class="board-river-label">楚 河</text>`;
+  svg += `<text x="528" y="408" class="board-river-label">漢 界</text>`;
 
   // 5. Hai Cửu Cung (Palaces) - Đường chéo hiển thị rõ nét
   // Cửu cung Đen (hàng 0..2, cột 3..5)
@@ -202,9 +202,9 @@ function renderBoard(container) {
       square.setAttribute('role', 'button');
       square.setAttribute('aria-label', `Ô hàng ${r}, cột ${c}`);
 
-      // Định vị chính xác tâm giao điểm theo phần trăm tỷ lệ 720 x 800
-      const leftPercent = ((40 + c * 80) / 720) * 100;
-      const topPercent = ((40 + r * 80) / 800) * 100;
+      // Định vị chính xác tâm giao điểm theo phần trăm tỷ lệ 736 x 816
+      const leftPercent = ((48 + c * 80) / 736) * 100;
+      const topPercent = ((48 + r * 80) / 816) * 100;
       square.style.left = `${leftPercent}%`;
       square.style.top = `${topPercent}%`;
 

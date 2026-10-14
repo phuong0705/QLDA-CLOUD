@@ -10,6 +10,9 @@
  * 4. Hỗ trợ chạy độc lập qua CLI (node server.js) lẫn require từ test runner.
  */
 
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
 const http = require('http');
 const { initSocket, getIO, closeSocket } = require('./src/config/socket');
 

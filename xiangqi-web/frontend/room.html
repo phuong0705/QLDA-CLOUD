@@ -1,16 +1,42 @@
-<!-- frontend/room.html -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Phòng chờ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Phòng chờ thi đấu Cờ Tướng trực tuyến - Xiangqi Web. Ghép trận 1v1 qua mã phòng." />
+  <title>Phòng Chờ Đấu - Xiangqi Web</title>
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/room.css" />
 </head>
 <body>
-  <!-- Container for the waiting room UI; content will be injected by waitingRoom.js -->
-  <div id="waiting-room"></div>
 
-  <!-- Import the module that builds the UI -->
+  <!-- Thanh tiêu đề điều hướng chung (Unified Topbar) -->
+  <header class="site-nav">
+    <div class="header-container">
+      <a href="index.html" class="brand-link" aria-label="Trang chủ Xiangqi Web">
+        <span class="brand-icon" aria-hidden="true">帥</span>
+        <span class="brand-title">Xiangqi Web</span>
+      </a>
+
+      <nav class="nav-menu" aria-label="Điều hướng chính">
+        <a href="index.html" class="nav-item">Trang chủ</a>
+        <a href="game.html" class="nav-item">Chơi cờ</a>
+        <a href="room.html" class="nav-item active" aria-current="page">Phòng chơi</a>
+        <a href="leaderboard.html" class="nav-item">Bảng xếp hạng</a>
+        <a href="history.html" class="nav-item">Lịch sử</a>
+        <a href="profile.html" class="nav-item">Hồ sơ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Container for the room lobby & waiting room UI -->
+  <main class="room-page-container">
+    <div id="waiting-room"></div>
+  </main>
+
+  <!-- Module logic -->
   <script type="module" src="js/room/waitingRoom.js"></script>
 </body>
 </html>
